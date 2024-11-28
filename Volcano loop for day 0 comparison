@@ -1,0 +1,99 @@
+library(EnhancedVolcano)
+library("ComplexHeatmap")
+library("ggrepel")
+library(pheatmap)
+library("gplots")
+library("MASS")
+library("matrixTests")
+library(future.apply)
+library(ggforce) 
+library(ggConvexHull)
+library("DESeq2")
+
+
+setwd("~/R/sorbonne_transcriptomics/project")
+data = read.delim("./02_data/Project-SARSHuman.txt")
+data = data[,-(22:54)]
+
+idx_h1n1 = grepl("H1N1",colnames(data))
+idx_sars_bat = grepl("SARS.BatSRBD",colnames(data))
+idx_sars_cov = grepl("SARS.Cov",colnames(data))
+idx_sars_dorf = grepl("SARS.dORF6",colnames(data))
+
+
+data_h1n1 = data[,idx_h1n1]
+data_sars_bat = data[,idx_sars_bat]
+data_sars_cov = data[,idx_sars_cov]
+data_sars_dorf = data[,idx_sars_dorf]
+#function
+
+DE = function(data, dataset_name ="dataset"){
+  sample_names <- colnames(data)
+  timepoint <- sapply(sample_names, function(x) strsplit(x, "_")[[1]][2]) # Second part is timepoint (e.g., 00h)
+  
+  metadata <- data.frame(timepoint)
+  metadata$type <- ifelse(metadata$timepoint == "00h", "baseline", metadata$timepoint)
+  metadata$type <- factor(metadata$type, levels = c("baseline", unique(metadata$type[metadata$type != "baseline"])))
+  rownames(metadata) <- sample_names  
+  dds <- DESeqDataSetFromMatrix(countData = round(data), colData = metadata, design = ~type)
+  dds <- DESeq(dds)
+  
+  timepoints <- metadata$type  # Comparisons to baseline
+  result_table <- data.frame() 
+  # Create a PDF to Save Volcano Plots
+  pdf(paste0("volcano_plots_", dataset_name, ".pdf"), width = 8, height = 6)
+  
+  # Loop Through Timepoints
+  for (tp in levels(metadata$type)[levels(metadata$type) != "baseline"]) {
+    # Perform the comparison
+    res <- results(dds, contrast = c("type", tp, "baseline"))
+    # Extract significant genes (adjusted p-value < 0.05 and |log2FoldChange| > 1)
+    res <- res[!is.na(res$padj) & !is.na(res$log2FoldChange), ]
+    sig_genes <- res[res$padj < 0.05 & abs(res$log2FoldChange) > 1, ]
+    sig_genes$timepoint <- tp
+    sig_genes$dataset <- dataset_name
+    result_table <- rbind(result_table, data.frame(
+      gene = rownames(sig_genes),
+      fold_change = sig_genes$log2FoldChange,
+      p_value_adj = sig_genes$padj,
+      timepoint = sig_genes$timepoint,
+      dataset = sig_genes$dataset
+    ))
+    # Plot Volcano Plot
+    volcano <- EnhancedVolcano(
+      res,
+      lab = rownames(res),
+      x = 'log2FoldChange',
+      y = 'padj',
+      title = paste("Volcano Plot:", tp, "vs Baseline"),
+      pCutoff = 0.05,
+      FCcutoff = 1.0,
+      pointSize = 2.0,
+      labSize = 3.0,
+      drawConnectors = TRUE,
+      max.overlaps = 10,
+      col = c('grey30', 'forestgreen', 'royalblue', 'red2')
+    )
+    
+    # Print to the PDF
+    print(volcano)
+  }
+  dev.off()
+  return(result_table)
+  
+}
+ 
+genes_h1n1 = DE(data_h1n1,"h1n1" )
+genes_sars_bat = DE(data_sars_bat,"sars_bat" )
+genes_sars_cov = DE(data_sars_cov,"sars_cov" )
+genes_sars_dorf = DE(data_sars_dorf,"sars_dorf" )
+
+
+all_results = list(genes_h1n1, genes_sars_bat, genes_sars_cov, genes_sars_dorf)
+
+
+# Combine all tables into one
+combined_table <- do.call(rbind, all_results)
+combined_table$direction = ifelse(combined_table$fold_change > 0, "Upregulated", "Downregulated")
+# Save the combined table to CSV
+write.csv(combined_table, "combined_results.csv", row.names = FALSE)
