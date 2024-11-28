@@ -1,0 +1,48 @@
+library("ComplexHeatmap")
+library("ggrepel")
+library(pheatmap)
+library("gplots")
+library("MASS")
+library("matrixTests")
+library(future.apply)
+library(ggforce) 
+library(ggConvexHull)
+
+options(future.globals.maxSize = 4 * 1024 * 1024 * 1024)
+setwd("~/R/sorbonne_transcriptomics/project")
+data = read.delim("./02_data/Project-SARSHuman.txt")
+
+
+data     <- t(scale(t(data), 
+                    center = TRUE, 
+                    scale = TRUE))
+
+d   <- dist(t(data))
+fit <- isoMDS(d, k=2)
+MDS = data.frame(fit$points)
+colnames(MDS) = c("x","y")
+
+MDS$sample   = colnames(data)
+MDS$type = as.vector(sapply(MDS$sample,function(x) paste(strsplit(x,"\\_")[[1]][1],collapse="_")))	
+MDS$time = as.vector(sapply(MDS$sample,function(x) paste(strsplit(x,"\\_")[[1]][2],collapse="_")))
+MDS$time_type <- paste(MDS$time, MDS$type, sep = "_")
+MDS_wo_mock = MDS[MDS$type != "mock",]
+plot <- ggplot()  +
+  geom_point(data = MDS_wo_mock, aes(x=x,
+                             y=y,
+                             color=type)) +
+  coord_fixed() +
+  theme(panel.background = element_blank(),
+        panel.border = element_rect(fill=NA),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position="right")+
+  geom_convexhull(data = MDS_wo_mock, aes(x = x, y = y, group = time_type, fill = type), alpha = 0.3) +
+  geom_text_repel(data = MDS_wo_mock, aes(x=x,y=y,label=time))
+
+plot(plot)
