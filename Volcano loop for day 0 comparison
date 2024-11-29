@@ -88,7 +88,7 @@ genes_h1n1 = DE(data_h1n1,"h1n1" )
 genes_sars_bat = DE(data_sars_bat,"sars_bat" )
 genes_sars_cov = DE(data_sars_cov,"sars_cov" )
 genes_sars_dorf = DE(data_sars_dorf,"sars_dorf" )
-genes_mock = DE(data_mock,"sars_mock" )
+genes_mock = DE(data_mock,"mock" )
 
 
 all_results = list(genes_h1n1, genes_sars_bat, genes_sars_cov, genes_sars_dorf)
