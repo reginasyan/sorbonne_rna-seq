@@ -13,18 +13,19 @@ library("DESeq2")
 
 setwd("~/R/sorbonne_transcriptomics/project")
 data = read.delim("./02_data/Project-SARSHuman.txt")
-data = data[,-(22:54)]
 
 idx_h1n1 = grepl("H1N1",colnames(data))
 idx_sars_bat = grepl("SARS.BatSRBD",colnames(data))
 idx_sars_cov = grepl("SARS.Cov",colnames(data))
 idx_sars_dorf = grepl("SARS.dORF6",colnames(data))
+idx_mock = grepl("mock",colnames(data))
 
 
 data_h1n1 = data[,idx_h1n1]
 data_sars_bat = data[,idx_sars_bat]
 data_sars_cov = data[,idx_sars_cov]
 data_sars_dorf = data[,idx_sars_dorf]
+data_mock = data[,idx_mock]
 #function
 
 DE = function(data, dataset_name ="dataset"){
@@ -87,6 +88,7 @@ genes_h1n1 = DE(data_h1n1,"h1n1" )
 genes_sars_bat = DE(data_sars_bat,"sars_bat" )
 genes_sars_cov = DE(data_sars_cov,"sars_cov" )
 genes_sars_dorf = DE(data_sars_dorf,"sars_dorf" )
+genes_mock = DE(data_mock,"sars_mock" )
 
 
 all_results = list(genes_h1n1, genes_sars_bat, genes_sars_cov, genes_sars_dorf)
