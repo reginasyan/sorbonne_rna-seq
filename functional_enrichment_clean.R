@@ -153,7 +153,7 @@ fe_plot_bar_ratiosorted = function(genenames,subtitle="",database_slc=''){
 }
 
 buble_plot = function(data_enriched,subtitle="",database_slc='') {
-  """Needs to be fed func_enr_data object in data_enr argument"""
+  #Needs to be fed func_enr_data object in data_enr argument
   
   #Vector of selectable databases
   dbs <- c("GO_Molecular_Function_2023",
