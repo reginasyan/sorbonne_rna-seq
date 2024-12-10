@@ -306,7 +306,7 @@ for(condition in colnames(func_enr_data)){
   print(condition)
   
   values = func_enr_data[,condition]
-  idx = values==1
+  idx = (values==1 | values==-1)
   genenames = rownames(func_enr_data)[idx]
   
   plot = fe_plot_bar_ratiosorted(genenames,condition,'BioPlanet_2019')
