@@ -16,6 +16,23 @@ create_euler_plot <- function(direction, timepoint, output_path) {
       SARS.dORF6 = upregulated_genes_tp$gene[upregulated_genes_tp$dataset=="SARS.dORF6"]
     )
     upregulated_genes_tp_4_viruses <- remove_empty_genes(upregulated_genes_tp_4_viruses)
+    
+    # Create a table of shared genes
+    all_genes <- unique(unlist(upregulated_genes_tp_4_viruses))  # Unique list of all genes
+    shared_genes_table <- data.frame(
+      Gene = all_genes,
+      H1N1 = all_genes %in% upregulated_genes_tp_4_viruses$H1N1,
+      SARS.BatSRBD = all_genes %in% upregulated_genes_tp_4_viruses$SARS.BatSRBD,
+      SARS.Cov = all_genes %in% upregulated_genes_tp_4_viruses$SARS.Cov,
+      SARS.dORF6 = all_genes %in% upregulated_genes_tp_4_viruses$SARS.dORF6
+    )
+    
+    # Convert logical values to "Yes"/"No" for better readability
+    shared_genes_table[-1] <- lapply(shared_genes_table[-1], function(x) ifelse(x, "Yes", "No"))
+    
+    # Save the shared gene table
+    table_filename <- paste0("~/R/sorbonne_transcriptomics/project/04_exports/", direction, "_genes_", timepoint, "_shared_table.csv")
+    write.csv(shared_genes_table, table_filename, row.names = FALSE)
     # Open PNG device
     pdf(output_path, width = 8, height = 8)
     # Euler plots
@@ -45,6 +62,23 @@ create_euler_plot <- function(direction, timepoint, output_path) {
       SARS.dORF6 = downregulated_genes_tp$gene[downregulated_genes_tp$dataset=="SARS.dORF6"]
     )
     downregulated_genes_tp_4_viruses <- remove_empty_genes(downregulated_genes_tp_4_viruses)
+    
+    # Create a table of shared genes
+    all_genes <- unique(unlist(downregulated_genes_tp_4_viruses))  # Unique list of all genes
+    shared_genes_table <- data.frame(
+      Gene = all_genes,
+      H1N1 = all_genes %in% downregulated_genes_tp_4_viruses$H1N1,
+      SARS.BatSRBD = all_genes %in% downregulated_genes_tp_4_viruses$SARS.BatSRBD,
+      SARS.Cov = all_genes %in% downregulated_genes_tp_4_viruses$SARS.Cov,
+      SARS.dORF6 = all_genes %in% downregulated_genes_tp_4_viruses$SARS.dORF6
+    )
+    
+    # Convert logical values to "Yes"/"No" for better readability
+    shared_genes_table[-1] <- lapply(shared_genes_table[-1], function(x) ifelse(x, "Yes", "No"))
+    
+    # Save the shared gene table
+    table_filename <- paste0("~/R/sorbonne_transcriptomics/project/04_exports/", direction, "_genes_", timepoint, "_shared_table.csv")
+    write.csv(shared_genes_table, table_filename, row.names = FALSE)
     # Open PNG device
     pdf(output_path, width = 8, height = 8)
     # Euler plots
@@ -120,3 +154,4 @@ create_euler_plot(direction ="Downregulated",
                   timepoint ="48h",
                   output_path = "./03_figures/downregulated_genes_48h_4_viruses.pdf"
 )
+
