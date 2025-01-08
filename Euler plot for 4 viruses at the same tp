@@ -1,0 +1,122 @@
+#libraries
+library(eulerr)
+#Remove empty genes
+remove_empty_genes <- function(gene_list) {
+  gene_list[sapply(gene_list, function(x) length(x) > 0)]
+}
+# Function to create and save Euler plots
+create_euler_plot <- function(direction, timepoint, output_path) {
+  if (direction == "Upregulated"){
+    upregulated_genes = combined_table[combined_table$direction=="Upregulated",-c(2,3)]
+    upregulated_genes_tp = upregulated_genes[upregulated_genes$timepoint == timepoint,]
+    upregulated_genes_tp_4_viruses <- list(
+      H1N1 = upregulated_genes_tp$gene[upregulated_genes_tp$dataset=="H1N1"],
+      SARS.BatSRBD = upregulated_genes_tp$gene[upregulated_genes_tp$dataset=="SARS.BatSRBD"],
+      SARS.Cov = upregulated_genes_tp$gene[upregulated_genes_tp$dataset=="SARS.Cov"],
+      SARS.dORF6 = upregulated_genes_tp$gene[upregulated_genes_tp$dataset=="SARS.dORF6"]
+    )
+    upregulated_genes_tp_4_viruses <- remove_empty_genes(upregulated_genes_tp_4_viruses)
+    # Open PNG device
+    pdf(output_path, width = 8, height = 8)
+    # Euler plots
+    euler_plot <- plot(
+      euler(upregulated_genes_tp_4_viruses),
+      fills = c("#D8BFD8", "#FFB6C1", "#B0C4DE", "#FFFACD"),
+      edges = TRUE,
+      legend = TRUE,
+      labels = FALSE,
+      quantities = TRUE,
+      main = paste("Upregulated ",timepoint, " 4 viruses"),
+      cex.main = 1.5,
+      cex.lab = 2,
+      cex.axis = 1.1,
+      cex.legend = 2
+    )
+    plot(euler_plot)
+    dev.off()
+  }
+  else{
+    downregulated_genes = combined_table[combined_table$direction=="Downregulated",-c(2,3)]
+    downregulated_genes_tp = downregulated_genes[downregulated_genes$timepoint == timepoint,]
+    downregulated_genes_tp_4_viruses <- list(
+      H1N1 = downregulated_genes_tp$gene[downregulated_genes_tp$dataset=="H1N1"],
+      SARS.BatSRBD = downregulated_genes_tp$gene[downregulated_genes_tp$dataset=="SARS.BatSRBD"],
+      SARS.Cov = downregulated_genes_tp$gene[downregulated_genes_tp$dataset=="SARS.Cov"],
+      SARS.dORF6 = downregulated_genes_tp$gene[downregulated_genes_tp$dataset=="SARS.dORF6"]
+    )
+    downregulated_genes_tp_4_viruses <- remove_empty_genes(downregulated_genes_tp_4_viruses)
+    # Open PNG device
+    pdf(output_path, width = 8, height = 8)
+    # Euler plots
+    euler_plot <- plot(
+      euler(downregulated_genes_tp_4_viruses),
+      fills = c("#D8BFD8", "#FFB6C1", "#B0C4DE", "#FFFACD"),
+      edges = TRUE,
+      legend = TRUE,
+      labels = FALSE,
+      quantities = TRUE,
+      main = paste("Downregulated ", timepoint, " 4 viruses"),
+      cex.main = 1.5,
+      cex.lab = 2,
+      cex.axis = 1.1,
+      cex.legend = 2
+    )
+    plot(euler_plot)
+    dev.off()
+    
+  }
+  
+}
+
+
+#Euler plots
+create_euler_plot(direction ="Upregulated",
+                  timepoint ="00h",
+                  output_path = "./03_figures/upregulated_genes_00h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  timepoint ="00h",
+                  output_path = "./03_figures/downregulated_genes_00h_4_viruses.pdf"
+)
+
+
+create_euler_plot(direction ="Upregulated",
+                  timepoint ="12h",
+                  output_path = "./03_figures/upregulated_genes_12h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  timepoint ="12h",
+                  output_path = "./03_figures/downregulated_genes_12h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Upregulated",
+                  timepoint ="24h",
+                  output_path = "./03_figures/upregulated_genes_24h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  timepoint ="24h",
+                  output_path = "./03_figures/downregulated_genes_24h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Upregulated",
+                  timepoint ="36h",
+                  output_path = "./03_figures/upregulated_genes_36h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  timepoint ="36h",
+                  output_path = "./03_figures/downregulated_genes_36h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Upregulated",
+                  timepoint ="48h",
+                  output_path = "./03_figures/upregulated_genes_48h_4_viruses.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  timepoint ="48h",
+                  output_path = "./03_figures/downregulated_genes_48h_4_viruses.pdf"
+)
