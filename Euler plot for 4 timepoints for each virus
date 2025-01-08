@@ -1,0 +1,144 @@
+#libraries
+library(eulerr)
+#Remove empty genes
+remove_empty_genes <- function(gene_list) {
+  gene_list[sapply(gene_list, function(x) length(x) > 0)]
+}
+# Function to create and save Euler plots
+create_euler_plot <- function(direction, virus, output_path) {
+  if (direction == "Upregulated"){
+    upregulated_genes = combined_table[combined_table$direction=="Upregulated",-c(2,3)]
+    upregulated_genes_virus = upregulated_genes[upregulated_genes$dataset == virus,]
+    upregulated_genes_virus_4_tp <- list(
+      h12 = upregulated_genes_virus$gene[upregulated_genes_virus$timepoint=="12h"],
+      h24 = upregulated_genes_virus$gene[upregulated_genes_virus$timepoint=="24h"],
+      h36 = upregulated_genes_virus$gene[upregulated_genes_virus$timepoint=="36h"],
+      h48 = upregulated_genes_virus$gene[upregulated_genes_virus$timepoint=="48h"]
+    )
+    upregulated_genes_virus_4_tp <- remove_empty_genes(upregulated_genes_virus_4_tp)
+    
+    # Create a table of shared genes
+    all_genes <- unique(unlist(upregulated_genes_virus_4_tp))  # Unique list of all genes
+    shared_genes_table <- data.frame(
+      Gene = all_genes,
+      h12 = all_genes %in% upregulated_genes_virus_4_tp$h12,
+      h24 = all_genes %in% upregulated_genes_virus_4_tp$h24,
+      h36 = all_genes %in% upregulated_genes_virus_4_tp$h36,
+      h48 = all_genes %in% upregulated_genes_virus_4_tp$h48
+    )
+    
+    # Convert logical values to "Yes"/"No" for better readability
+    shared_genes_table[-1] <- lapply(shared_genes_table[-1], function(x) ifelse(x, "Yes", "No"))
+    
+    # Save the shared gene table
+    table_filename <- paste0("~/R/sorbonne_transcriptomics/project/04_exports/", direction, "_genes_", virus, "_shared_table.csv")
+    write.csv(shared_genes_table, table_filename, row.names = FALSE)
+    # Open PNG device
+    pdf(output_path, width = 8, height = 8)
+    # Euler plots
+    euler_plot <- plot(
+      euler(upregulated_genes_virus_4_tp),
+      fills = c("#D8BFD8", "#FFB6C1", "#B0C4DE", "#FFFACD"),
+      edges = TRUE,
+      legend = TRUE,
+      labels = FALSE,
+      quantities = TRUE,
+      main = paste("Upregulated ",virus, " 4 timepoints"),
+      cex.main = 1.5,
+      cex.lab = 2,
+      cex.axis = 1.1,
+      cex.legend = 2
+    )
+    plot(euler_plot)
+    dev.off()
+  }
+  else{
+    downregulated_genes = combined_table[combined_table$direction=="Downregulated",-c(2,3)]
+    downregulated_genes_virus = downregulated_genes[downregulated_genes$dataset == virus,]
+    downregulated_genes_virus_4_tp <- list(
+      h12 = downregulated_genes_virus$gene[downregulated_genes_virus$timepoint=="12h"],
+      h24 = downregulated_genes_virus$gene[downregulated_genes_virus$timepoint=="24h"],
+      h36 = downregulated_genes_virus$gene[downregulated_genes_virus$timepoint=="36h"],
+      h48 = downregulated_genes_virus$gene[downregulated_genes_virus$timepoint=="48h"]
+    )
+    downregulated_genes_virus_4_tp <- remove_empty_genes(downregulated_genes_virus_4_tp)
+    
+    # Create a table of shared genes
+    all_genes <- unique(unlist(downregulated_genes_virus_4_tp))  # Unique list of all genes
+    shared_genes_table <- data.frame(
+      Gene = all_genes,
+      h12 = all_genes %in% downregulated_genes_virus_4_tp$h12,
+      h24 = all_genes %in% downregulated_genes_virus_4_tp$h24,
+      h36 = all_genes %in% downregulated_genes_virus_4_tp$h36,
+      h48 = all_genes %in% downregulated_genes_virus_4_tp$h48
+    )
+    
+    # Convert logical values to "Yes"/"No" for better readability
+    shared_genes_table[-1] <- lapply(shared_genes_table[-1], function(x) ifelse(x, "Yes", "No"))
+    
+    # Save the shared gene table
+    table_filename <- paste0("~/R/sorbonne_transcriptomics/project/04_exports/", direction, "_genes_", virus, "_shared_table.csv")
+    write.csv(shared_genes_table, table_filename, row.names = FALSE)
+    # Open PNG device
+    pdf(output_path, width = 8, height = 8)
+    # Euler plots
+    euler_plot <- plot(
+      euler(downregulated_genes_virus_4_tp),
+      fills = c("#D8BFD8", "#FFB6C1", "#B0C4DE", "#FFFACD"),
+      edges = TRUE,
+      legend = TRUE,
+      labels = FALSE,
+      quantities = TRUE,
+      main = paste("Downregulated ",virus, " 4 timepoints"),
+      cex.main = 1.5,
+      cex.lab = 2,
+      cex.axis = 1.1,
+      cex.legend = 2
+    )
+    plot(euler_plot)
+    dev.off()
+    
+  }
+  
+}
+
+
+#Euler plots
+create_euler_plot(direction ="Upregulated",
+                  virus ="H1N1",
+                  output_path = "./03_figures/upregulated_genes_H1N1_4_tp.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  virus ="H1N1",
+                  output_path = "./03_figures/downregulated_genes_H1N1_4_tp.pdf"
+)
+
+
+create_euler_plot(direction ="Upregulated",
+                  virus ="SARS.BatSRBD",
+                  output_path = "./03_figures/upregulated_genes_SARS.BatSRBD_4_tp.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  virus ="SARS.BatSRBD",
+                  output_path = "./03_figures/downregulated_genes_SARS.BatSRBD_4_tp.pdf"
+)
+create_euler_plot(direction ="Upregulated",
+                  virus ="SARS.Cov",
+                  output_path = "./03_figures/upregulated_genes_SARS.Cov_4_tp.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  virus ="SARS.Cov",
+                  output_path = "./03_figures/downregulated_genes_SARS.Cov_4_tp.pdf"
+)
+create_euler_plot(direction ="Upregulated",
+                  virus ="SARS.dORF6",
+                  output_path = "./03_figures/upregulated_genes_SARS.dORF6_4_tp.pdf"
+)
+
+create_euler_plot(direction ="Downregulated",
+                  virus ="SARS.dORF6",
+                  output_path = "./03_figures/downregulated_genes_SARS.dORF6_4_tp.pdf"
+)
