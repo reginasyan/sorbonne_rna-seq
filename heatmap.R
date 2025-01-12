@@ -167,3 +167,81 @@ pdf("./03_plots/combined_heatmaps.pdf", width = 12, height = 8)
 draw(Reduce(`+`, heatmaps),annotation_legend_list = list(combined_legends))
 dev.off()
 
+
+##
+##Analysis of dorf and BAT  clustering
+##
+
+# Subset the columns for dORF6 and BatSRBD
+dORF6_cols  <- virus_groups[["SARS_dORF6"]]
+batSRBD_cols <- virus_groups[["SARS_BatSRBD"]]
+
+#Pool those two subsets into one
+subset_data <- heatmap_data[, c(dORF6_cols, batSRBD_cols), drop = FALSE]
+
+col_virus <- data.frame(
+  Virus = c(
+    rep("SARS.dORF6", length(dORF6_cols)),
+    rep("SARS.BatSRBD", length(batSRBD_cols))
+  )
+)
+
+rownames(col_virus) <- colnames(subset_data)
+colnames(subset_data) <- sapply(colnames(subset_data), function(x) strsplit(x, "_")[[1]][1])
+
+# Use the same color function you've been using
+col_fun <- colorRamp2(c(-5, 0, 5), c("darkblue", "#f7f7f7", "#d73027"))
+
+# Define color mapping for the column annotation
+col_anno <- HeatmapAnnotation(
+  df = col_virus,
+  col = list(
+    Virus = c("SARS.dORF6"="green", "SARS.BatSRBD"="purple")
+  ),
+  show_legend = FALSE
+)
+
+# Create a shared legend
+fold_change_legend <- Legend(
+  title = "Fold Change", 
+  col_fun = col_fun, 
+  at = c(-5, 0, 5), 
+  labels = c("-5", "0", "5")
+)
+
+# Create a separate legend for the Virus annotation
+virus_legend <- Legend(
+  title = "Virus",
+  at = c("SARS.dORF6", "SARS.BatSRBD"),
+  legend_gp = gpar(fill = c("green", "purple"))
+)
+
+# Pack the two legends vertically (stacked)
+combined_legends <- packLegend(
+  fold_change_legend,
+  virus_legend,
+  direction = "vertical"
+)
+
+heatmap_dorf_bat <- Heatmap(
+  subset_data,
+  name = "FoldChange",
+  col  = col_fun,
+  cluster_rows    = FALSE,  
+  cluster_columns = TRUE,   
+  top_annotation  = col_anno, 
+  show_row_names  = FALSE, 
+  show_column_names = TRUE,  
+  show_heatmap_legend = FALSE,
+  column_names_side = "top"
+)
+
+# Draw the heatmap
+pdf("./03_plots/dORF6_vs_BatSRBD.pdf", width = 8, height = 10)
+draw(
+  heatmap_dorf_bat,
+  annotation_legend_side = "right",
+  annotation_legend_list = list(combined_legends)
+)
+dev.off()
+
