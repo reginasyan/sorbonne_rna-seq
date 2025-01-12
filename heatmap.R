@@ -83,7 +83,7 @@ heatmap_data <- as.matrix(heatmap_data[, -1])  # Remove the 'gene' column
 
 heatmap_data[is.na(heatmap_data)] <- 0  # Replace NAs with 0 -> neutral fold change for non stastistically enriched
 
-heatmap_data_filtered <- heatmap_data[apply(heatmap_data, 1, sd) > 0.5, ]
+#heatmap_data_filtered <- heatmap_data[apply(heatmap_data, 1, sd) > 0.5, ]
 
 
 #Groups of viruses for heatmap generation
@@ -97,6 +97,7 @@ virus_groups <- list(
 # Create a consistent row order using hierarchical clustering
 row_order <- hclust(dist(heatmap_data))$order
 
+#Shared Color Scheme between legends -10 to 10 color scale
 col_fun <- colorRamp2(c(-10, 0, 10), c("darkblue", "#f7f7f7", "#d73027"))
 
 # Create individual heatmaps for each virus group
@@ -138,7 +139,7 @@ heatmaps <- lapply(names(virus_groups), function(virus) {
     )
 })
 
-# Create a shared legend
+# Create a shared legend for fold change -10 to 10 scaling
 fold_change_legend <- Legend(
   title = "Fold Change", 
   col_fun = col_fun, 
@@ -146,7 +147,7 @@ fold_change_legend <- Legend(
   labels = c("-10", "0", "10")
 )
 
-# Create a shared legend for Direction
+# Create a shared legend for Direction of overall enrichment
 direction_legend <- Legend(
   title = "Overall regulation",
   labels = c("Up", "Down"),
