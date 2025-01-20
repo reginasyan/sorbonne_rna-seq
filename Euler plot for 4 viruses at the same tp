@@ -1,6 +1,7 @@
 #libraries
 library(eulerr)
-#Remove empty genes
+
+#Remove empty genes function
 remove_empty_genes <- function(gene_list) {
   gene_list[sapply(gene_list, function(x) length(x) > 0)]
 }
