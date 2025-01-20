@@ -1,4 +1,0 @@
-#Pipeline of the work
-1. MDS and PCA
-2. Volcanoplots (two comparisons - with mock and day zero) + VennDiagram(how to perform?) + UpsetPlot (for all the comparisons)
-3. Enrichment for two different methods
