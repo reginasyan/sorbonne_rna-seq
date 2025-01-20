@@ -8,11 +8,10 @@ library(future.apply)
 library(ggforce) 
 library(ggConvexHull)
 
-options(future.globals.maxSize = 4 * 1024 * 1024 * 1024)
+#setting working directory and creating a data table
+
 setwd("~/R/sorbonne_transcriptomics/project")
 data = read.delim("./02_data/Project-SARSHuman.txt")
-
-
 data     <- t(scale(t(data), 
                     center = TRUE, 
                     scale = TRUE))
@@ -29,7 +28,7 @@ MDS$time = as.vector(sapply(MDS$sample,function(x) paste(strsplit(x,"\\_")[[1]][
 MDS$time_type <- paste(MDS$time, MDS$type, sep = "_")
 MDS$culture = as.vector(sapply(MDS$sample,function(x) paste(strsplit(x,"\\_")[[1]][3],collapse="_")))
 MDS$type_culture = paste(MDS$culture, MDS$type, sep = "_")
-#MDS_wo_mock = MDS[MDS$type != "mock",]
+
 
 # all viruses on single plot
 plot <- ggplot()  +
